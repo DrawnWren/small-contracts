@@ -20,18 +20,21 @@ contract Payout {
     // for every payout
     uint total;
 
-    function Payout(address director) {
+    modifier onlyController(){
+        if(msg.sender != controller) throw;
+        _;
+    }
+
+    function Payout(address director){
         // give control of the contract to whichever address is specified
         controller = director;
         // initialize 0
         total = 0;
     }
 
-    function addPayee(address payTo, uint payShares) {
-        if(msg.sender != controller || payShares == 0) {
-            throw;
-        }
-
+    function addPayee(address payTo, uint payShares) 
+    onlyController
+    {
         // check the mapping for a balance because this is a faster operation
         // uninitialized = 0
         if(shares[payTo] > 0) {
@@ -52,11 +55,9 @@ contract Payout {
         }
    }
 
-    function removePayee(address payTo) {
-        if(msg.sender != controller) {
-            throw;
-        } 
-
+    function removePayee(address payTo) 
+    onlyController
+    {
         // check for a non 0 value in the map
         if(shares[payTo] > 0) {
             // null out the shares
