@@ -12,6 +12,9 @@ contract Payout {
     // an array of all of the payees
     // needed because mappings aren't iterable
     address[] payees;
+    
+    // address to store the last account we tried to send to if an error occurred
+    address public error;
 
     // total number of shares in the contract. Stored so we don't have to recalculate 
     // for every payout
@@ -76,7 +79,12 @@ contract Payout {
         for(uint i = 0; i < payees.length; i++) {
             pay = payees[i];
             s = shares[pay];
-            pay.send(shareVal * s);
+            // throw an error and undo all work if send to any address fails
+            if(!pay.send(shareVal * s)) {
+                // I'm not sure if this will roll back after an error or not
+                error = pay;
+                throw;
+            }
         }
         return true;
     }
