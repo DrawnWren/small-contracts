@@ -89,7 +89,7 @@ contract Payout {
     onlyController
     {
         // check for a non 0 value in the map
-        if(shares[payTo] > 0) {
+        if(shares[payTo].shareCount > 0) {
             // null out the shares
             shares[payTo].shareCount = 0;
             // subtract the number of shares from the total
@@ -112,7 +112,7 @@ contract Payout {
         uint s;
         for(uint i = 0; i < payees.length; i++) {
             pay = payees[i];
-            s = shares[pay];
+            s = shares[pay].shareCount;
             // throw an error and undo all work if send to any address fails
             if(!pay.send(shareVal * s)) {
                 // I'm not sure if this will roll back after an error or not
